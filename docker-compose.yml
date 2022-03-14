@@ -1,0 +1,30 @@
+version: '3.9'
+services:
+  app:
+    container_name: 'siege_td_backend'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - './src:/app/src'
+    ports:
+      - '8080:8080'
+    depends_on:
+      - 'db'
+    env_file:
+      - '.env'
+  db:
+    container_name: 'siege_td_database'
+    iamge: postgres
+    volumes:
+      - siege_td-data:/var/lib/postgresql/data
+    networks:
+      - siege_td_backend
+    ports:
+      - '5432:5432'
+    env_file:
+      - '.env'
+volumes:
+  siege_td-data:
+networks:
+  siege_td_backend:
