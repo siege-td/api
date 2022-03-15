@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - './src:/app/src'
+    networks:
+      - siege_td_backend
     ports:
       - '8080:8080'
     depends_on:
@@ -15,9 +17,9 @@ services:
       - '.env'
   db:
     container_name: 'siege_td_database'
-    iamge: postgres
+    image: postgres
     volumes:
-      - siege_td-data:/var/lib/postgresql/data
+      - siege_td_data:/var/lib/postgresql/data
     networks:
       - siege_td_backend
     ports:
@@ -25,6 +27,6 @@ services:
     env_file:
       - '.env'
 volumes:
-  siege_td-data:
+  siege_td_data:
 networks:
   siege_td_backend:

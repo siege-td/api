@@ -11,19 +11,15 @@ async function boot() {
     try {
         const server = express()
 
-        const app = load({ server })
+        await load({ server })
 
-        server.listen(process.env.HTTP_PORT, () => {
-            console.log(`
-            LISTENING ON 
-               ${process.env.HTTP_PORT}
-              
-=========  SERVER STARTED  =========
-\n\n`)
-        })
+        server.listen(process.env.HTTP_PORT)
+        console.log(`Listening on ${process.env.HTTP_PORT}`)
+        console.log('\n========== SERVER STARTED ===========\n')
     } catch (error) {
-        console.log('\n\n=========== 💥  TERROR 💥  ============\n\n')
+        console.log('\n=========== 💥  TERROR 💥  ============\n')
     }
+
 }
 
 void boot() // API is started here

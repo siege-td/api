@@ -29,10 +29,13 @@
     "express": "^4.17.3",
     "http": "^0.0.1-security",
     "nodemon": "^2.0.15",
+    "pg": "^8.7.3",
     "prettier": "^2.5.1",
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.4.1",
     "ts-node-dev": "^1.1.8",
-    "typeorm": "^0.2.45"
+    "tsconfig-paths": "^3.14.0",
+    "typeorm": "^0.2.45",
+    "yarn": "^1.22.17"
   }
 }
