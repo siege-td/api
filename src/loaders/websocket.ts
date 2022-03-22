@@ -2,10 +2,6 @@ import { Application } from "express";
 import http from 'http'
 import { Server, Socket } from "socket.io";
 
-interface INewLobby {
-    pin: number
-    lobby: string | string[]
-}
 
 export default async (expressApp: Application) => {
     const httpServer = http.createServer(expressApp)
@@ -19,15 +15,20 @@ export default async (expressApp: Application) => {
     socketServer.on('connection', (socketConnection: Socket) => {
         console.log(`Socket: ${socketConnection.id} connected`)
 
-        socketConnection.on('new_lobby', (newLobby: INewLobby) => {
-            socketRooms.set(newLobby.pin, newLobby.lobby)
-            socketConnection.join(socketRooms.get(newLobby.pin)!)
-            console.log(socketRooms.get(newLobby.pin))
+        socketConnection.on('new_lobby', (newPin: number) => {
+            const roomName = `room${socketRooms.size}`
+            socketConnection.join(roomName)
+            socketRooms.set(newPin, roomName)
         })
 
         socketConnection.on('join_lobby', (pin: number) => {
             socketConnection.join(socketRooms.get(pin)!)
-            console.log(socketRooms.get(pin))
+        })
+
+        socketConnection.on('close_lobby', (pin: number) => {
+            // Close socket room
+            socketServer.in(socketRooms.get(pin)!).disconnectSockets(true)
+            socketRooms.delete(pin)
         })
     })
 
