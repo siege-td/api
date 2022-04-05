@@ -72,10 +72,10 @@ export default async (expressApp: Application) => {
             // If exists, update data and emit
             const tempData = gameSessionsData.get(pin)
 
-            if (tempData?.length === 0) {
-                tempData.push({ playerName, hitpoints, currency })
+            if (tempData?.length === 1) {
+                tempData[0] = { playerName, hitpoints, currency }
                 gameSessionsData.set(pin, tempData)
-            } else if (tempData !== undefined) {
+            } else if (tempData !== undefined && tempData.length > 1) {
                 for (let i = 0; i < tempData.length; i++) {
                     if (playerName === tempData[i].playerName) {
                         tempData[i] = { playerName, hitpoints, currency }
