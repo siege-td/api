@@ -83,8 +83,8 @@ export default async (expressApp: Application) => {
                     }
                 }
             }
-            console.log(gameSessionsData.get(pin))
-            socketConnection.to(socketRooms.get(pin)!).emit("updated_data", gameSessionsData.get(pin!))
+            socketConnection.emit("updated_data", gameSessionsData.get(pin!))
+            socketConnection.to(socketRooms.get(1)!).emit("updated_data", gameSessionsData.get(pin!))
         })
     })
 
