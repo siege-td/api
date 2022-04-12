@@ -24,13 +24,14 @@ export default async (expressApp: Application) => {
         socketConnection.on('new_lobby', (newPin: number) => {
             const roomName = `room${socketRooms.size}`
             socketConnection.join(roomName)
-
+            // TODO: Add check for room that already exists
             socketRooms.set(newPin, roomName)
             gameSessionsData.set(newPin, [{
                 playerName: socketConnection.id,
                 hitpoints: 100,
                 currency: 0
             }])
+            console.log(`Socket: ${socketConnection.id} created lobby with pin: ${newPin}`)
         })
 
         socketConnection.on('join_lobby', (pin: number) => {
@@ -43,6 +44,7 @@ export default async (expressApp: Application) => {
             )
             
             gameSessionsData.set(pin, currentData!)
+            console.log(`Socket: ${socketConnection.id} joined lobby ${pin}, number in lobby: ${socketRooms.get(pin)?.length}`)
         })
 
         socketConnection.on('close_lobby', (pin: number) => {
@@ -87,6 +89,8 @@ export default async (expressApp: Application) => {
             socketConnection.to(socketRooms.get(1)!).emit("updated_data", gameSessionsData.get(pin!))
         })
     })
-
+    /**
+     * TODO: HANDLE HOW DISCONNECTS SHOULD HAPPEN
+     */
     httpServer.listen(process.env.WS_PORT)
 }
