@@ -93,6 +93,10 @@ export default async (expressApp: Application) => {
         socketConnection.on("get_game_data_in_room", (pin: number) => {
             socketConnection.emit("game_data_in_room", gameSessionsData.get(pin))
         })
+
+        socketConnection.on("start_game", (pin: number) => {
+            socketConnection.to(socketRooms.get(pin)!).emit("game_started");
+        })
     })
     /**
      * TODO: HANDLE HOW DISCONNECTS SHOULD HAPPEN
