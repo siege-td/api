@@ -27,7 +27,7 @@ export default async (expressApp: Application) => {
             // TODO: Add check for room that already exists
             socketRooms.set(newPin, roomName)
             gameSessionsData.set(newPin, [{
-                playerName: socketConnection.id,
+                playerName: socketConnection.id.substring(0, 6),
                 hitpoints: 100,
                 currency: 0
             }])
@@ -77,6 +77,7 @@ export default async (expressApp: Application) => {
             if (tempData?.length === 1) {
                 tempData[0] = { playerName, hitpoints, currency }
                 gameSessionsData.set(pin, tempData)
+                console.log(`Updated data for socket: ${socketConnection.id}`)
             } else if (tempData !== undefined && tempData.length > 1) {
                 for (let i = 0; i < tempData.length; i++) {
                     if (playerName === tempData[i].playerName) {
@@ -86,7 +87,11 @@ export default async (expressApp: Application) => {
                 }
             }
             socketConnection.emit("updated_data", gameSessionsData.get(pin!))
-            socketConnection.to(socketRooms.get(1)!).emit("updated_data", gameSessionsData.get(pin!))
+            socketConnection.to(socketRooms.get(pin)!).emit("updated_data", gameSessionsData.get(pin!))
+        })
+
+        socketConnection.on("get_game_data_in_room", (pin: number) => {
+            socketConnection.emit("game_data_in_room", gameSessionsData.get(pin))
         })
     })
     /**
