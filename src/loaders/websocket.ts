@@ -108,8 +108,6 @@ export default async (expressApp: Application) => {
             }
         }) 
     })
-    /**
-     * TODO: HANDLE HOW DISCONNECTS SHOULD HAPPEN
-     */
+    
     httpServer.listen(process.env.WS_PORT)
 }
