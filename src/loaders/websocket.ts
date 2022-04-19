@@ -35,7 +35,13 @@ export default async (expressApp: Application) => {
         })
 
         socketConnection.on('join_lobby', (pin: number) => {
+             // First, check if room exists
+             if (!socketRooms.get(pin)) {
+                socketConnection.emit("join_pin_invalid", { message: "Pin invalid" })
+                return
+            }
             socketConnection.join(socketRooms.get(pin)!)
+            socketConnection.emit("join_pin_valid", {message: "Pin valid"})
             const currentData = gameSessionsData.get(pin)
             
             currentData?.push({playerName: socketConnection.id,
