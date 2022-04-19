@@ -25,12 +25,19 @@ export default async (expressApp: Application) => {
             const roomName = `room${socketRooms.size}`
             socketConnection.join(roomName)
             // TODO: Add check for room that already exists
+            for(let [key,] of socketRooms){
+                if(newPin == key){
+                    socketConnection.emit("create_pin_exists", { message: "Pin already exists" })
+                    return
+                }
+            }
             socketRooms.set(newPin, roomName)
             gameSessionsData.set(newPin, [{
                 playerName: socketConnection.id.substring(0, 6),
                 hitpoints: 100,
                 currency: 0
             }])
+            socketConnection.emit("create_pin_valid", { message: "Lobby created" })
             console.log(`Socket: ${socketConnection.id} created lobby with pin: ${newPin}`)
         })
 
@@ -50,6 +57,7 @@ export default async (expressApp: Application) => {
             )
             
             gameSessionsData.set(pin, currentData!)
+            console.log("yalla")
             console.log(`Socket: ${socketConnection.id} joined lobby ${pin}, number in lobby: ${socketRooms.get(pin)?.length}`)
         })
 
