@@ -97,6 +97,16 @@ export default async (expressApp: Application) => {
         socketConnection.on("start_game", (pin: number) => {
             socketConnection.to(socketRooms.get(pin)!).emit("game_started");
         })
+
+        socketConnection.on('disconnect', () => {
+            for(let [key, value] of gameSessionsData){
+                for(let i = 0; i < value!.length; i++){
+                    if(socketConnection.id == value![i].playerName){
+                        gameSessionsData.set(key,value?.splice(i,1))
+                    }
+                }
+            }
+        }) 
     })
     /**
      * TODO: HANDLE HOW DISCONNECTS SHOULD HAPPEN
