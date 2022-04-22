@@ -25,17 +25,30 @@ export default async (expressApp: Application) => {
             const roomName = `room${socketRooms.size}`
             socketConnection.join(roomName)
             // TODO: Add check for room that already exists
+            for(let [key,] of socketRooms){
+                if(newPin == key){
+                    socketConnection.emit("create_pin_exists", { message: "Pin already exists" })
+                    return
+                }
+            }
             socketRooms.set(newPin, roomName)
             gameSessionsData.set(newPin, [{
                 playerName: socketConnection.id.substring(0, 6),
                 hitpoints: 100,
                 currency: 0
             }])
+            socketConnection.emit("create_pin_valid", { message: "Lobby created" })
             console.log(`Socket: ${socketConnection.id} created lobby with pin: ${newPin}`)
         })
 
         socketConnection.on('join_lobby', (pin: number) => {
+             // First, check if room exists
+             if (!socketRooms.get(pin)) {
+                socketConnection.emit("join_pin_invalid", { message: "Pin invalid" })
+                return
+            }
             socketConnection.join(socketRooms.get(pin)!)
+            socketConnection.emit("join_pin_valid", {message: "Pin valid"})
             const currentData = gameSessionsData.get(pin)
             
             currentData?.push({playerName: socketConnection.id,
