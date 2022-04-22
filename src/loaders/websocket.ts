@@ -57,7 +57,6 @@ export default async (expressApp: Application) => {
             )
             
             gameSessionsData.set(pin, currentData!)
-            console.log("yalla")
             console.log(`Socket: ${socketConnection.id} joined lobby ${pin}, number in lobby: ${socketRooms.get(pin)?.length}`)
         })
 
