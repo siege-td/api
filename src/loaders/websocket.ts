@@ -117,25 +117,29 @@ export default async (expressApp: Application) => {
         })
 
         socketConnection.on("next_round", (pin: number) => {
-            for(let value of gameSessionsData.get(pin)!){
-                if(value.playerName === socketConnection.id){
-                    value.nextRound = true
-                }
-            }
-            if(gameSessionsData.get(pin)?.every(v => v.nextRound === true)){
-                for(let value of gameSessionsData.get(pin)!){
-                    value.nextRound = false
-                }
+            if(gameSessionsData.get(pin) == undefined){
                 socketConnection.emit("next_round")
-                socketConnection.to(socketRooms.get(pin)!).emit("next_round")
-            }
-        })
-        socketConnection.on('disconnect', () => {
-            for(let [key, value] of gameSessionsData){
-                for(let i = 0; i < value!.length; i++){
-                    if(socketConnection.id == value![i].playerName){
-                        gameSessionsData.set(key,value?.splice(i,1))
+            } else {
+                for(let value of gameSessionsData.get(pin)!){
+                    if(value.playerName === socketConnection.id){
+                        value.nextRound = true
                     }
+                }
+                if(gameSessionsData.get(pin)?.every(v => v.nextRound === true)){
+                    for(let value of gameSessionsData.get(pin)!){
+                        value.nextRound = false
+                    }
+                    socketConnection.emit("next_round")
+                    socketConnection.to(socketRooms.get(pin)!).emit("next_round")
+                }
+            }
+            })
+            socketConnection.on('disconnect', () => {
+                for(let [key, value] of gameSessionsData){
+                    for(let i = 0; i < value!.length; i++){
+                        if(socketConnection.id == value![i].playerName){
+                            gameSessionsData.set(key,value?.splice(i,1))
+                        }
                 }
             }
         }) 
