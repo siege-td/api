@@ -26,6 +26,12 @@ export default async (expressApp: Application) => {
             const roomName = `room${socketRooms.size}`
             socketConnection.join(roomName)
             // TODO: Add check for room that already exists
+            for(let [key,] of socketRooms){
+                if(newPin == key){
+                    socketConnection.emit("create_pin_exists", { message: "Pin already exists" })
+                    return
+                }
+            }
             socketRooms.set(newPin, roomName)
             gameSessionsData.set(newPin, [{
                 playerName: socketConnection.id.substring(0, 6),
@@ -33,11 +39,18 @@ export default async (expressApp: Application) => {
                 currency: 0,
                 nextRound: true
             }])
+            socketConnection.emit("create_pin_valid", { message: "Lobby created" })
             console.log(`Socket: ${socketConnection.id} created lobby with pin: ${newPin}`)
         })
 
         socketConnection.on('join_lobby', (pin: number) => {
+             // First, check if room exists
+             if (!socketRooms.get(pin)) {
+                socketConnection.emit("join_pin_invalid", { message: "Pin invalid" })
+                return
+            }
             socketConnection.join(socketRooms.get(pin)!)
+            socketConnection.emit("join_pin_valid", {message: "Pin valid"})
             const currentData = gameSessionsData.get(pin)
             
             currentData?.push({playerName: socketConnection.id,
@@ -117,9 +130,16 @@ export default async (expressApp: Application) => {
                 socketConnection.to(socketRooms.get(pin)!).emit("next_round")
             }
         })
+        socketConnection.on('disconnect', () => {
+            for(let [key, value] of gameSessionsData){
+                for(let i = 0; i < value!.length; i++){
+                    if(socketConnection.id == value![i].playerName){
+                        gameSessionsData.set(key,value?.splice(i,1))
+                    }
+                }
+            }
+        }) 
     })
-    /**
-     * TODO: HANDLE HOW DISCONNECTS SHOULD HAPPEN
-     */
+    
     httpServer.listen(process.env.WS_PORT)
 }
