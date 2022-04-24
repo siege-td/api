@@ -35,8 +35,8 @@ export default async (expressApp: Application) => {
             socketRooms.set(newPin, roomName)
             gameSessionsData.set(newPin, [{
                 playerName: socketConnection.id.substring(0, 6),
-                hitpoints: 100,
-                currency: 0,
+                hitpoints: 30,
+                currency: 100,
                 nextRound: true
             }])
             socketConnection.emit("create_pin_valid", { message: "Lobby created" })
@@ -54,8 +54,8 @@ export default async (expressApp: Application) => {
             const currentData = gameSessionsData.get(pin)
             
             currentData?.push({playerName: socketConnection.id,
-                hitpoints: 100,
-                currency: 0,
+                hitpoints: 30,
+                currency: 100,
                 nextRound: true
             })
             
@@ -120,11 +120,19 @@ export default async (expressApp: Application) => {
             if(gameSessionsData.get(pin) == undefined){
                 socketConnection.emit("next_round")
             } else {
-                for(let value of gameSessionsData.get(pin)!){
-                    if(value.playerName === socketConnection.id.substring(0,5)){
-                        value.nextRound = true
+                // set currents player nextround value to true
+                let currData = gameSessionsData.get(pin)
+                if (currData?.length === 1) {
+                    currData[0].nextRound = true;
+                } else if (currData!.length > 1) {
+                    for (let i  = 0; i < currData!.length; i++) {
+                        if (socketConnection.id.substring(0,5) === currData![i].playerName.substring(0,5)) {
+                            currData![i].nextRound = true
+                            gameSessionsData.set(pin, currData)
+                        }
                     }
                 }
+
                 if(gameSessionsData.get(pin)?.every(v => v.nextRound === true)){
 
                     for(let value of gameSessionsData.get(pin)!){
@@ -134,13 +142,13 @@ export default async (expressApp: Application) => {
                     socketConnection.to(socketRooms.get(pin)!).emit("next_round")
                 }
             }
-            })
-            socketConnection.on('disconnect', () => {
-                for(let [key, value] of gameSessionsData){
-                    for(let i = 0; i < value!.length; i++){
-                        if(socketConnection.id.substring(0,5) == value![i].playerName){
-                            gameSessionsData.set(key,value?.splice(i,1))
-                        }
+        })
+        socketConnection.on('disconnect', () => {
+            for(let [key, value] of gameSessionsData){
+                for(let i = 0; i < value!.length; i++){
+                    if(socketConnection.id.substring(0,5) == value![i].playerName){
+                        gameSessionsData.set(key,value?.splice(i,1))
+                    }
                 }
             }
         }) 
