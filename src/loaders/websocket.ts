@@ -98,7 +98,7 @@ export default async (expressApp: Application) => {
                 console.log(`Updated data for socket: ${socketConnection.id}`)
             } else if (tempData !== undefined && tempData.length > 1) {
                 for (let i = 0; i < tempData.length; i++) {
-                    if (playerName === tempData[i].playerName) {
+                    if (socketConnection.id.substring(0,5) === tempData![i].playerName.substring(0,5)) {
                         tempData[i] = { playerName, hitpoints, currency, nextRound }
                         gameSessionsData.set(pin, tempData)
                     }
