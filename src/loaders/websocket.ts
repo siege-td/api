@@ -121,5 +121,4 @@ export default async (expressApp: Application) => {
             }
         }) 
     })
-    httpServer.listen(process.env.PORT)
 }
