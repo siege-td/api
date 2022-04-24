@@ -122,5 +122,5 @@ export default async (expressApp: Application) => {
         }) 
     })
     
-    httpServer.listen(process.env.WS_PORT)
+    httpServer.listen(8877)
 }
