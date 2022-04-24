@@ -9,7 +9,9 @@ interface IGameData {
 }
 
 export default async (expressApp: Application) => {
-    const socketServer = new Server(http.createServer(expressApp), {
+    const httpServer = http.createServer(expressApp)
+
+    const socketServer = new Server(httpServer, {
         cors: { origin: '*' }
     })
 
@@ -119,4 +121,5 @@ export default async (expressApp: Application) => {
             }
         }) 
     })
+    httpServer.listen(8877)
 }
