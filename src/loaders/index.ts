@@ -20,5 +20,5 @@ export const load = async ({ server }: { server: Application}) => {
 
     loaded = true
 
-    return { loadedExpress, }
+    return { loadedExpress }
 }
