@@ -13,7 +13,7 @@ async function boot() {
 
         await load({ server })
 
-        server.listen(process.env.HTTP_PORT)
+        server.listen(8080)
         console.log(`Listening on 8080`)
         console.log('\n========== SERVER STARTED ===========\n')
     } catch (error) {
