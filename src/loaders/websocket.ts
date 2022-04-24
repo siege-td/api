@@ -35,8 +35,8 @@ export default async (expressApp: Application) => {
             socketRooms.set(newPin, roomName)
             gameSessionsData.set(newPin, [{
                 playerName: socketConnection.id.substring(0, 6),
-                hitpoints: 100,
-                currency: 0,
+                hitpoints: 30,
+                currency: 100,
                 nextRound: true
             }])
             socketConnection.emit("create_pin_valid", { message: "Lobby created" })
@@ -45,7 +45,7 @@ export default async (expressApp: Application) => {
 
         socketConnection.on('join_lobby', (pin: number) => {
              // First, check if room exists
-             if (!socketRooms.get(pin)) {
+            if (!socketRooms.get(pin)!) {
                 socketConnection.emit("join_pin_invalid", { message: "Pin invalid" })
                 return
             }
