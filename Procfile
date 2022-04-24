@@ -1,1 +1,1 @@
-web: npm install && npm start
+web: echo hello && npm install && npm start
