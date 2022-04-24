@@ -6,6 +6,7 @@ interface IGameData {
     playerName: string
     hitpoints: number
     currency: number
+    nextRound: boolean
 }
 
 export default async (expressApp: Application) => {
@@ -35,7 +36,8 @@ export default async (expressApp: Application) => {
             gameSessionsData.set(newPin, [{
                 playerName: socketConnection.id.substring(0, 6),
                 hitpoints: 100,
-                currency: 0
+                currency: 0,
+                nextRound: true
             }])
             socketConnection.emit("create_pin_valid", { message: "Lobby created" })
             console.log(`Socket: ${socketConnection.id} created lobby with pin: ${newPin}`)
@@ -53,8 +55,9 @@ export default async (expressApp: Application) => {
             
             currentData?.push({playerName: socketConnection.id,
                 hitpoints: 100,
-                currency: 0}
-            )
+                currency: 0,
+                nextRound: true
+            })
             
             gameSessionsData.set(pin, currentData!)
             console.log(`Socket: ${socketConnection.id} joined lobby ${pin}, number in lobby: ${socketRooms.get(pin)?.length}`)
@@ -72,12 +75,14 @@ export default async (expressApp: Application) => {
                 pin, 
                 playerName, 
                 hitpoints, 
-                currency
+                currency,
+                nextRound
             }: {
                 pin: number, 
                 playerName: string, 
                 hitpoints: number, 
-                currency: number
+                currency: number,
+                nextRound: boolean
             }) => {
             // First, check if room exists
             if (!socketRooms.get(pin)) {
@@ -88,13 +93,13 @@ export default async (expressApp: Application) => {
             const tempData = gameSessionsData.get(pin)
 
             if (tempData?.length === 1) {
-                tempData[0] = { playerName, hitpoints, currency }
+                tempData[0] = { playerName, hitpoints, currency, nextRound }
                 gameSessionsData.set(pin, tempData)
                 console.log(`Updated data for socket: ${socketConnection.id}`)
             } else if (tempData !== undefined && tempData.length > 1) {
                 for (let i = 0; i < tempData.length; i++) {
                     if (playerName === tempData[i].playerName) {
-                        tempData[i] = { playerName, hitpoints, currency }
+                        tempData[i] = { playerName, hitpoints, currency, nextRound }
                         gameSessionsData.set(pin, tempData)
                     }
                 }
@@ -111,12 +116,30 @@ export default async (expressApp: Application) => {
             socketConnection.to(socketRooms.get(pin)!).emit("game_started");
         })
 
-        socketConnection.on('disconnect', () => {
-            for(let [key, value] of gameSessionsData){
-                for(let i = 0; i < value!.length; i++){
-                    if(socketConnection.id == value![i].playerName){
-                        gameSessionsData.set(key,value?.splice(i,1))
+        socketConnection.on("next_round", (pin: number) => {
+            if(gameSessionsData.get(pin) == undefined){
+                socketConnection.emit("next_round")
+            } else {
+                for(let value of gameSessionsData.get(pin)!){
+                    if(value.playerName === socketConnection.id){
+                        value.nextRound = true
                     }
+                }
+                if(gameSessionsData.get(pin)?.every(v => v.nextRound === true)){
+                    for(let value of gameSessionsData.get(pin)!){
+                        value.nextRound = false
+                    }
+                    socketConnection.emit("next_round")
+                    socketConnection.to(socketRooms.get(pin)!).emit("next_round")
+                }
+            }
+            })
+            socketConnection.on('disconnect', () => {
+                for(let [key, value] of gameSessionsData){
+                    for(let i = 0; i < value!.length; i++){
+                        if(socketConnection.id == value![i].playerName){
+                            gameSessionsData.set(key,value?.splice(i,1))
+                        }
                 }
             }
         }) 
