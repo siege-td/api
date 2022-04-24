@@ -53,7 +53,7 @@ export default async (expressApp: Application) => {
             socketConnection.emit("join_pin_valid", {message: "Pin valid"})
             const currentData = gameSessionsData.get(pin)
             
-            currentData?.push({playerName: socketConnection.id,
+            currentData?.push({playerName: socketConnection.id.substring(0, 6),
                 hitpoints: 30,
                 currency: 100,
                 nextRound: true
