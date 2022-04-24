@@ -1,1 +1,1 @@
-web: echo hello && npm install && npm start
+web: npm install -g typescript && npm install && npm start
