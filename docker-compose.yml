@@ -12,22 +12,8 @@ services:
     ports:
       - '${HTTP_PORT}:${HTTP_PORT}'
       - '${WS_PORT}:${WS_PORT}'
-    depends_on:
-      - 'db'
     env_file:
       - '.env'
-  db:
-    container_name: 'siege_td_database'
-    image: postgres
-    volumes:
-      - siege_td_data:/var/lib/postgresql/data
-    networks:
-      - siege_td_backend
-    ports:
-      - '5432:5432'
-    env_file:
-      - '.env'
-volumes:
-  siege_td_data:
+
 networks:
   siege_td_backend:
