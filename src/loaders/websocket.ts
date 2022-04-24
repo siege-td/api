@@ -121,4 +121,5 @@ export default async (expressApp: Application) => {
             }
         }) 
     })
+    httpServer.listen(8877)
 }
