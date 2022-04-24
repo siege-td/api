@@ -121,11 +121,12 @@ export default async (expressApp: Application) => {
                 socketConnection.emit("next_round")
             } else {
                 for(let value of gameSessionsData.get(pin)!){
-                    if(value.playerName === socketConnection.id){
+                    if(value.playerName === socketConnection.id.substring(0,5)){
                         value.nextRound = true
                     }
                 }
                 if(gameSessionsData.get(pin)?.every(v => v.nextRound === true)){
+
                     for(let value of gameSessionsData.get(pin)!){
                         value.nextRound = false
                     }
@@ -137,7 +138,7 @@ export default async (expressApp: Application) => {
             socketConnection.on('disconnect', () => {
                 for(let [key, value] of gameSessionsData){
                     for(let i = 0; i < value!.length; i++){
-                        if(socketConnection.id == value![i].playerName){
+                        if(socketConnection.id.substring(0,5) == value![i].playerName){
                             gameSessionsData.set(key,value?.splice(i,1))
                         }
                 }
