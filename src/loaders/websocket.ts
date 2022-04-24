@@ -34,7 +34,7 @@ export default async (expressApp: Application) => {
             }
             socketRooms.set(newPin, roomName)
             gameSessionsData.set(newPin, [{
-                playerName: socketConnection.id.substring(0, 5),
+                playerName: socketConnection.id.substring(0, 6),
                 hitpoints: 100,
                 currency: 0,
                 nextRound: true
