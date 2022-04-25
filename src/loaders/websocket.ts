@@ -152,6 +152,9 @@ export default async (expressApp: Application) => {
                 }
             }
         }) 
+        socketConnection.on("start_init_round", () => {
+            console.log("First round started")
+        })
     })
     httpServer.listen(8877)
 }
