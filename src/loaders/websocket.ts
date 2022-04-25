@@ -146,8 +146,10 @@ export default async (expressApp: Application) => {
         socketConnection.on('disconnect', () => {
             for(let [key, value] of gameSessionsData){
                 for(let i = 0; i < value!.length; i++){
-                    if(socketConnection.id.substring(0,5) == value![i].playerName){
-                        gameSessionsData.set(key,value?.splice(i,1))
+                    if(socketConnection.id.substring(0,5) == value![i].playerName.substring(0,5)){
+                        const currData = gameSessionsData.get(key)
+                        currData!.splice(i,1)
+                        gameSessionsData.set(key,currData)
                     }
                 }
             }
